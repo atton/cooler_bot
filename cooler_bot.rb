@@ -41,7 +41,11 @@ def reply tweet
   option = {"in_reply_to_status_id"=>tweet.id}
   msg = "@#{tweet.user.screen_name} クーラーください"
 
+  # duplicate とかすると落ちちゃうので、begin-rescue-end でゴリ押し。
+  begin
   Twitter.update msg,option
+  rescue
+  end
 end
 
 client.user do |status|
