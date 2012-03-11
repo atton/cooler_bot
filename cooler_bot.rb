@@ -26,20 +26,11 @@ end
 
 client = UserStream.client
 
-def check_tags tags,tag_text
-  # ハッシュタグのチェック
-
-  tags.each do |tag|
-    return true if tag.text == tag_text
-  end
-  false
-end
-
-def reply tweet
+def reply tweet , str
   # tweet に対してリプライする
 
   option = {"in_reply_to_status_id"=>tweet.id}
-  msg = "@#{tweet.user.screen_name} クーラーください"
+  msg = "@#{tweet.user.screen_name} #{str}"
 
   # duplicate とかすると落ちちゃうので、begin-rescue-end でゴリ押し。
   begin
@@ -48,15 +39,9 @@ def reply tweet
   end
 end
 
-client.user do |status|
-  if status.has_key? "text"
-    # text を持ってる時。 普通のtweet。
-    if !status.entities.hashtags.empty?
-      # ハッシュタグを持ってる時
-      if check_tags(status.entities.hashtags , "ギークハウス沖縄")
-        reply status
-      end
-    end
-  end
+# filter.json 使ってみる
+client.endpoint = 'https://stream.twitter.com/'
+client.post('/1/statuses/filter.json', track: '#ギークハウス沖縄') do |status|
+  reply status,"クーラーください"
 end
 
